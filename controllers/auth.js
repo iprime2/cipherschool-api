@@ -20,13 +20,11 @@ const register = async (req, res) => {
       password: hashedPassword,
     })
 
-    console.log(newUser)
-
     const user = await newUser.save()
 
     //const { password, ...info } = user._doc
 
-    res.status(201).json(user)
+    res.status(201).json({ msg: 'User Created', user })
   } catch (error) {
     console.log(error)
     res.status(500).json(error)
