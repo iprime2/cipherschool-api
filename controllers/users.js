@@ -32,28 +32,54 @@ const getAll = async (req, res) => {
   }
 }
 
-const update = async (req, res) => {
-  if (req.user.id === req.params.id || req.user.isAdmin) {
-    if (req.body.password) {
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body
+
+  if (!currentPassword || !newPassword) {
+    res.status(StatusCodes.NOT_FOUND).json('Please provide the password')
+    return
+  }
+
+  try {
+    let currentPassword = req.body.currentPassword
+    const user = await User.findById(req.params.id)
+
+    const isPasswordMatch = await bcrypt.compare(currentPassword, user.password)
+
+    if (isPasswordMatch) {
       const salt = await bcrypt.genSalt(10)
-      req.body.password = await bcrypt.hash(password, salt)
-    }
+      newPassword = await bcrypt.hash(req.body.newPassword, salt)
 
-    try {
-      const updateUser = await User.findByIdAndUpdate(
-        req.params.id,
-        {
-          $set: req.body,
-        },
-        { new: true }
-      )
+      user.password = newPassword
+      await user.save()
 
-      res.status(StatusCodes.OK).json(updateUser)
-    } catch (error) {
-      res.status(StatusCodes.BAD_REQUEST).json(error)
+      res.status(StatusCodes.OK).json('Success! Password Changed')
+    } else if (req.body.currentPassword !== user.password) {
+      res.status(StatusCodes.BAD_REQUEST).json('Old password is incorrect')
     }
-  } else {
-    res.status(StatusCodes.FORBIDDEN).json('You can only update your account')
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json(error)
+  }
+}
+
+const update = async (req, res) => {
+  if (req.body.password) {
+    const salt = await bcrypt.genSalt(10)
+    req.body.password = await bcrypt.hash(password, salt)
+  }
+
+  try {
+    const updateUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    )
+
+    res.status(StatusCodes.OK).json({ msg: 'User details Updated', updateUser })
+  } catch (error) {
+    res.status(StatusCodes.BAD_REQUEST).json(error)
   }
 }
 
@@ -115,4 +141,5 @@ module.exports = {
   getOne,
   getAll,
   userStats,
+  changePassword,
 }

@@ -5,6 +5,8 @@ const dotenv = require('dotenv')
 const helmet = require('helmet')
 const morgan = require('morgan')
 const cors = require('cors')
+const path = require('path')
+const multer = require('multer')
 
 dotenv.config()
 
@@ -20,6 +22,9 @@ app.use(helmet())
 app.use(morgan('common'))
 app.use(cors(corsOptions))
 
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
+app.use('/images', express.static(path.join(__dirname, 'public/images')))
+
 // routes
 const authRoute = require('./routes/auth')
 const usersRoute = require('./routes/users')
@@ -29,6 +34,26 @@ const detailsRoute = require('./routes/details')
 app.use('/api/auth', authRoute)
 app.use('/api/users', usersRoute)
 app.use('/api/details', detailsRoute)
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/images')
+  },
+  filename: (req, file, cb) => {
+    console.log(req.body.name)
+    cb(null, req.body.name)
+  },
+})
+
+const upload = multer({ storage: storage })
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  console.log(req.body.name)
+  try {
+    return res.status(200).json('File uploded successfully')
+  } catch (error) {
+    console.error(error)
+  }
+})
 
 const start = async () => {
   try {

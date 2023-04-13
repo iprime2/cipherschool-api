@@ -20,8 +20,12 @@ const register = async (req, res) => {
       password: hashedPassword,
     })
 
+    console.log(newUser)
+
     const user = await newUser.save()
+
     //const { password, ...info } = user._doc
+
     res.status(201).json(user)
   } catch (error) {
     console.log(error)
@@ -32,6 +36,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email })
+
     if (!user) {
       return res.status(401).json('user not found')
     }

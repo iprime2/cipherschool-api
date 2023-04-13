@@ -10,9 +10,23 @@ const DetailsSchema = new mongoose.Schema(
     aboutMe: {
       type: String,
     },
-    links: {
-      type: Object,
-      default: [],
+    githubLink: {
+      type: String,
+    },
+    linkedinLink: {
+      type: String,
+    },
+    facebookLink: {
+      type: String,
+    },
+    twitterLink: {
+      type: String,
+    },
+    instagramLink: {
+      type: String,
+    },
+    websiteLink: {
+      type: String,
     },
     currently: {
       type: String,
