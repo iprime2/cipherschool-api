@@ -11,7 +11,8 @@ const multer = require('multer')
 dotenv.config()
 
 const corsOptions = {
-  origin: ['http://localhost:3000'],
+  origin: ['http://localhost:3000', 
+'https://cipherschool.on.fleek.co'],
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 }
